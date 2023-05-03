@@ -1,2 +1,2 @@
 rootProject.name = "one-time-code"
-include("domain", ":app")
+include("domain", "app")
