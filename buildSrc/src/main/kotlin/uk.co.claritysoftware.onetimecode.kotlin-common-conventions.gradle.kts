@@ -9,27 +9,18 @@ plugins {
 group = "uk.co.claritysoftware.onetimecode"
 version = "1.0.0"
 
-ext["assertj.version"] = "3.24.2"
-ext["mockito.version"] = "4.1.0"
-ext["mockito.jupiter.version"] = "5.3.1"
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
-    // Test dependencies
-    testImplementation(kotlin("test"))
-    testImplementation("org.assertj:assertj-core:${property("assertj.version")}")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:${property("mockito.version")}")
-    testImplementation("org.mockito:mockito-junit-jupiter:${property("mockito.jupiter.version")}")
 }
 
+java.sourceCompatibility = JavaVersion.VERSION_17
 tasks.withType<KotlinCompile> {
     kotlinOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = "17"
     }
 }

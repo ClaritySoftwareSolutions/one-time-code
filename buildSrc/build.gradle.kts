@@ -18,6 +18,6 @@ dependencies {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        jvmTarget = "170"
+        jvmTarget = "17"
     }
 }
