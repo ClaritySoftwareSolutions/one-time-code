@@ -6,6 +6,9 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint-idea")
 }
 
+apply(plugin = "org.jetbrains.kotlin.jvm")
+apply(plugin = "org.jlleitschuh.gradle.ktlint")
+
 group = "uk.co.claritysoftware.onetimecode"
 version = "1.0.0"
 
@@ -15,6 +18,7 @@ repositories {
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.2")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_17

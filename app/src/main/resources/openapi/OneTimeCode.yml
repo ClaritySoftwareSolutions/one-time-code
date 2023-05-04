@@ -1,0 +1,196 @@
+openapi: 3.0.0
+info:
+  title: One Time Code APIs
+  version: '0.0.1'
+  description: OpenAPI Spec document describing the REST APIs for the One Time Code application
+  contact:
+    name: Clarity Software Solutions Ltd
+    email: admin@claritysoftware.co.uk
+    url: https://claritysoftware.co.uk
+
+#
+# --------------------------------------------------------------------------------
+#
+paths:
+
+  '/one-time-code':
+    options:
+      summary: CORS support
+      description: |
+        Enable CORS by returning correct headers
+      tags:
+        - One Time Code
+      responses:
+        200:
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content: { }
+    post:
+      summary: Generates a new One Time Code
+      description: Generates a new One Time Code
+      operationId: generate-one-time-code
+      tags:
+        - One Time Code
+      responses:
+        201:
+          $ref: '#/components/responses/OneTimeCode'
+
+# --------------------------------------------------------------------------------
+#
+components:
+  #
+  # Schema and Enum Definitions
+  # --------------------------------------------------------------------------------
+  schemas:
+    ErrorResponse:
+      title: ErrorResponse
+      description: |
+        A generic response body object describing errors in a web request, and can be used to communicate several
+        different types of error condition such as (but not limited to) `400 BAD REQUEST`, `409 CONFLICT` etc.
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: '2022-09-28T18:01:42.105Z'
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: 'Bad Request'
+        message:
+          type: string
+          example: 'Validation failed for object=applicationRequest. Error count: 14'
+        validationErrors:
+          description: Validation errors are only present if the error being described is a `400 BAD REQUEST`.
+          type: array
+          items:
+            type: string
+          example: 'Error on field applicant.nino: rejected value [aaaaaaaaaaa], must match ^.{1,10}$'
+      required:
+        - timestamp
+        - status
+        - error
+        - message
+
+    OneTimeCodeResponse:
+      title: OneTimeCodeResponse
+      description: Object containing a One Time Code
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of this One Time Code that needs to be submitted when validating
+          example: 'b49b0d9a-ac25-43f0-b848-18971040bae7'
+        code:
+          type: string
+          description: The value of the One Time Code
+          example: 'ABCDEF'
+        expiry:
+          type: string
+          format: date-time
+          example: '2022-09-28T18:01:42.105Z'
+      required:
+        - id
+        - code
+        - expiry
+
+
+  #
+  # Response Body Definitions
+  # --------------------------------------------------------------------------------
+  responses:
+    400ErrorResponse:
+      description: Error response for a HTTP 400 describing fields in the request payload that are in error
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            timestamp: '2022-09-28T18:01:42.105Z'
+            status: 400
+            error: 'Bad Request'
+            message: 'Validation failed for object=applicationRequest. Error count: 14'
+            validationErrors: 'Error on field applicant.nino: rejected value [aaaaaaaaaaa], must match ^.{1,10}$'
+    404ErrorResponse:
+      description: |
+        Error response for a HTTP 404 describing the problem with the request.
+        Typical examples are resources such as the application not found.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            timestamp: '2022-09-28T18:01:42.105Z'
+            status: 404
+            error: 'Not Found'
+            message: 'Certificate photo for voter card application with eroId=[some-ero] and applicationType=[VOTER_CARD] and applicationId=[507f1f77bcf86cd799439011] not found'
+    409ErrorResponse:
+      description: |
+        Error response for a HTTP 409 describing the problem with the request.
+        Typical examples are that an application's status(es) are not in the required state to perform the requested operation.
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            timestamp: '2022-09-28T18:01:42.105Z'
+            status: 409
+            error: 'Conflict'
+            message: 'An application with eroId = some-ero and applicationType = VOTER_CARD and applicationId = 507f1f77bcf86cd799439011 has an unexpected photoCheckStatus = ACCEPTED'
+
+    OneTimeCode:
+      description: Response object containing a One Time Code
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OneTimeCodeResponse'
