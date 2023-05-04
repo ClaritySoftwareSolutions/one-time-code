@@ -9,6 +9,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("plugin.spring") version "1.8.20"
 
+    kotlin("kapt")
     id("org.openapi.generator") version "6.5.0"
 }
 
@@ -30,6 +31,9 @@ dependencies {
 
     implementation("org.springdoc:springdoc-openapi-ui:1.6.15")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    implementation("org.mapstruct:mapstruct:1.5.5.Final")
+    kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
 
     // Test dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -90,5 +94,12 @@ tasks.withType<KtLintCheckTask> {
 ktlint {
     filter {
         exclude { projectDir.toURI().relativize(it.file.toURI()).path.contains("/generated/") }
+    }
+}
+
+kapt {
+    arguments {
+        arg("mapstruct.defaultComponentModel", "spring")
+        arg("mapstruct.unmappedTargetPolicy", "IGNORE")
     }
 }
