@@ -12,8 +12,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeValidationNotMatchedException
+import uk.co.claritysoftware.onetimecode.domain.aOneTimeCode
 import uk.co.claritysoftware.onetimecode.domain.repository.OneTimeCodeRepository
-import uk.co.claritysoftware.onetimecode.domain.testsupport.testdata.aOneTimeCode
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset

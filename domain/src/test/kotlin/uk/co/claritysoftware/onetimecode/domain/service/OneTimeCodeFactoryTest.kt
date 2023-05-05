@@ -1,7 +1,7 @@
 package uk.co.claritysoftware.onetimecode.domain.service
 
 import org.junit.jupiter.api.Test
-import uk.co.claritysoftware.onetimecode.domain.testsupport.assertj.assertions.assertThat
+import uk.co.claritysoftware.onetimecode.domain.assertj.assertions.assertThat
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset

@@ -1,4 +1,4 @@
-package uk.co.claritysoftware.onetimecode.domain.testsupport.assertj.assertions
+package uk.co.claritysoftware.onetimecode.domain.assertj.assertions
 
 import org.assertj.core.api.AbstractAssert
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCode

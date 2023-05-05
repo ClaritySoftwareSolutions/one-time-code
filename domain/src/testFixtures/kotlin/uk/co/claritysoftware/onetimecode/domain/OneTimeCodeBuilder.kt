@@ -1,7 +1,5 @@
-package uk.co.claritysoftware.onetimecode.domain.testsupport.testdata
+package uk.co.claritysoftware.onetimecode.domain
 
-import uk.co.claritysoftware.onetimecode.domain.OneTimeCode
-import uk.co.claritysoftware.onetimecode.domain.Status
 import java.time.Instant
 
 fun aOneTimeCode(
