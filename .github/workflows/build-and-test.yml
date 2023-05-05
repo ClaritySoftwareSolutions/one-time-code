@@ -24,6 +24,6 @@ jobs:
         if: failure()
         with:
           name: Test logs
-          path:
-            - app/build/reports/tests/test
-            - domain/build/reports/tests/test
+          path: |
+            app/build/reports/tests/test
+            domain/build/reports/tests/test
