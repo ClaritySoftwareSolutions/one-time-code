@@ -11,6 +11,9 @@ plugins {
 
     kotlin("kapt")
     id("org.openapi.generator") version "6.5.0"
+
+    // Apply the java-test-fixtures plugin.
+    `java-test-fixtures`
 }
 
 apply(plugin = "org.springframework.boot")
@@ -36,7 +39,6 @@ dependencies {
     kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
 
     // Test dependencies
-    testImplementation(testFixtures(project(":app")))
     testImplementation(testFixtures(project(":domain")))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
