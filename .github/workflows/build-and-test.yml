@@ -14,10 +14,9 @@ jobs:
         with:
           distribution: corretto
           java-version: 17
-          cache: gradle
 
       - name: Run gradle `check` to lint source code and run tests
-        run: ./gradlew clean check --no-daemon
+        run: ./gradlew clean check
 
       - name: Save logs on test failure
         uses: actions/upload-artifact@v3

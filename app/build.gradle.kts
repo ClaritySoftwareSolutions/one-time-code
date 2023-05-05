@@ -11,9 +11,6 @@ plugins {
 
     kotlin("kapt")
     id("org.openapi.generator") version "6.5.0"
-
-    // Apply the java-test-fixtures plugin.
-    `java-test-fixtures`
 }
 
 apply(plugin = "org.springframework.boot")
