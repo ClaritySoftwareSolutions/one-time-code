@@ -8,6 +8,7 @@ plugins {
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("plugin.spring") version "1.8.20"
+    kotlin("plugin.jpa") version "1.8.20"
 
     kotlin("kapt")
     id("org.openapi.generator") version "6.5.0"
@@ -17,30 +18,42 @@ apply(plugin = "org.springframework.boot")
 apply(plugin = "io.spring.dependency-management")
 apply(plugin = "org.jetbrains.kotlin.plugin.spring")
 apply(plugin = "org.jetbrains.kotlin.plugin.allopen")
+apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
 
 apply(plugin = "org.openapi.generator")
+
+ext["mapstruct.version"] = "1.5.5.Final"
+ext["springdoc.version"] = "1.6.15"
+ext["mockito-kotlin.version"] = "4.1.0"
+ext["h2.version"] = "2.1.214"
 
 dependencies {
     implementation(project(":domain"))
 
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
-    implementation("org.springdoc:springdoc-openapi-ui:1.6.15")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+    implementation("org.springdoc:springdoc-openapi-ui:${property("springdoc.version")}")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
-    implementation("org.mapstruct:mapstruct:1.5.5.Final")
-    kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
+    implementation("org.mapstruct:mapstruct:${property("mapstruct.version")}")
+    kapt("org.mapstruct:mapstruct-processor:${property("mapstruct.version")}")
 
     // Test dependencies
     testImplementation(testFixtures(project(":domain")))
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
 
-    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
+    testImplementation("com.h2database:h2:${property("h2.version")}")
+
+    testImplementation("org.mockito.kotlin:mockito-kotlin:${property("mockito-kotlin.version")}")
 
     // Test fixtures dependencies
     testFixturesImplementation("org.assertj:assertj-core")

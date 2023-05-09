@@ -4,8 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import uk.co.claritysoftware.onetimecode.database.jpa.JpaBackedOneTimeCodeRepository
 import uk.co.claritysoftware.onetimecode.domain.repository.OneTimeCodeRepository
-import uk.co.claritysoftware.onetimecode.domain.repository.OneTimeCodeRepositoryImpl
 import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeFactory
 import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeService
 import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeServiceConfiguration
@@ -22,18 +22,18 @@ class DomainConfiguration {
     fun oneTimeCodeFactory(clock: Clock): OneTimeCodeFactory =
         OneTimeCodeFactory(clock)
 
-    @Bean
+    @Bean("domainOneTimeCodeRepository")
     fun oneTimeCodeRepository(): OneTimeCodeRepository =
-        OneTimeCodeRepositoryImpl()
+        JpaBackedOneTimeCodeRepository()
 
     @Bean
     fun oneTimeCodeService(
         oneTimeCodeFactory: OneTimeCodeFactory,
         serviceConfiguration: OneTimeCodeServiceConfiguration,
-        oneTimeCodeRepository: OneTimeCodeRepository,
+        domainOneTimeCodeRepository: OneTimeCodeRepository,
         clock: Clock
     ): OneTimeCodeService =
-        OneTimeCodeServiceImpl(oneTimeCodeFactory, serviceConfiguration, oneTimeCodeRepository, clock)
+        OneTimeCodeServiceImpl(oneTimeCodeFactory, serviceConfiguration, domainOneTimeCodeRepository, clock)
 }
 
 @ConfigurationProperties(prefix = "app")
