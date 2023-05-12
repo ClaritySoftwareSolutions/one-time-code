@@ -6,24 +6,21 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeService
+import uk.co.claritysoftware.onetimecode.mapper.OneTimeCodeMapper
 import uk.co.claritysoftware.onetimecode.models.OneTimeCodeResponse
-import java.time.ZoneOffset
 
 @RestController
 @RequestMapping("/one-time-code")
 class OneTimeCodeController(
-    private val oneTimeCodeService: OneTimeCodeService
+    private val oneTimeCodeService: OneTimeCodeService,
+    private val oneTimeCodeMapper: OneTimeCodeMapper,
 ) {
 
     @PostMapping
     @ResponseStatus(CREATED)
     fun generateOneTimeCode(): OneTimeCodeResponse {
         return oneTimeCodeService.createOneTimeCode().let {
-            OneTimeCodeResponse(
-                id = it.id,
-                code = it.code,
-                expiry = it.expiry.atOffset(ZoneOffset.UTC)
-            )
+            oneTimeCodeMapper.fromDomainToApi(it)
         }
     }
 }
