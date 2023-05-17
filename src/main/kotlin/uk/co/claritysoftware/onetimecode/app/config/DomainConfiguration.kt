@@ -4,9 +4,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import uk.co.claritysoftware.onetimecode.app.database.jpa.JpaBackedOneTimeCodeRepository
-import uk.co.claritysoftware.onetimecode.domain.repository.OneTimeCodeRepository
+import uk.co.claritysoftware.onetimecode.app.database.jpa.JpaBackedOneTimeCodePersistenceService
+import uk.co.claritysoftware.onetimecode.app.database.jpa.mapper.OneTimeCodeEntityMapper
+import uk.co.claritysoftware.onetimecode.app.database.jpa.mapper.StatusEntityMapper
+import uk.co.claritysoftware.onetimecode.app.database.jpa.repository.OneTimeCodeRepository
 import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeFactory
+import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodePersistenceService
 import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeService
 import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeServiceConfiguration
 import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeServiceImpl
@@ -22,18 +25,22 @@ class DomainConfiguration {
     fun oneTimeCodeFactory(clock: Clock): OneTimeCodeFactory =
         OneTimeCodeFactory(clock)
 
-    @Bean("domainOneTimeCodeRepository")
-    fun oneTimeCodeRepository(): OneTimeCodeRepository =
-        JpaBackedOneTimeCodeRepository()
+    @Bean
+    fun jpaOneTimeCodePersistenceService(
+        oneTimeCodeRepository: OneTimeCodeRepository,
+        oneTimeCodeEntityMapper: OneTimeCodeEntityMapper,
+        statusEntityMapper: StatusEntityMapper
+    ): OneTimeCodePersistenceService =
+        JpaBackedOneTimeCodePersistenceService(oneTimeCodeRepository, oneTimeCodeEntityMapper, statusEntityMapper)
 
     @Bean
     fun oneTimeCodeService(
         oneTimeCodeFactory: OneTimeCodeFactory,
         serviceConfiguration: OneTimeCodeServiceConfiguration,
-        domainOneTimeCodeRepository: OneTimeCodeRepository,
+        oneTimeCodePersistenceService: OneTimeCodePersistenceService,
         clock: Clock
     ): OneTimeCodeService =
-        OneTimeCodeServiceImpl(oneTimeCodeFactory, serviceConfiguration, domainOneTimeCodeRepository, clock)
+        OneTimeCodeServiceImpl(oneTimeCodeFactory, serviceConfiguration, oneTimeCodePersistenceService, clock)
 }
 
 @ConfigurationProperties(prefix = "app")

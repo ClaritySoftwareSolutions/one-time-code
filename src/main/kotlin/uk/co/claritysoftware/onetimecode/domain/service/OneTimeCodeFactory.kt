@@ -4,7 +4,7 @@ import uk.co.claritysoftware.onetimecode.domain.OneTimeCode
 import java.time.Clock
 import java.time.Instant
 
-class OneTimeCodeFactory(private val clock: Clock) {
+open class OneTimeCodeFactory(private val clock: Clock) {
 
     fun createOneTimeCode(characterSet: Set<Char>, codeLength: Int, codeTtlSeconds: Long): OneTimeCode {
         val expiry = Instant.now(clock).plusSeconds(codeTtlSeconds)

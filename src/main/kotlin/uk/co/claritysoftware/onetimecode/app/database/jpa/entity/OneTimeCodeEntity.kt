@@ -7,34 +7,65 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.persistence.Version
+import org.hibernate.Hibernate
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
 import java.time.Instant
 import java.util.UUID
 
 @Table
 @Entity
-class OneTimeCodeEntity {
+class OneTimeCodeEntity(
 
     @Id
     @GeneratedValue
     @UuidGenerator
-    val id: UUID? = null
+    var id: UUID? = null,
 
     @Column
-    val oneTimeCodeId: UUID? = null
+    var oneTimeCodeId: UUID? = null,
 
     @Column
-    val value: String? = null
+    var value: String? = null,
 
     @Column
-    val expires: Instant? = null
+    var expires: Instant? = null,
 
     @Column
-    val attempts: Int? = null
+    var attempts: Int? = null,
 
     @Column
     @Enumerated(value = EnumType.STRING)
-    val status: Status? = null
+    var status: Status? = null,
+
+    @Column
+    @CreationTimestamp
+    var dateCreated: Instant? = null,
+
+    @Column
+    @UpdateTimestamp
+    var dateUpdated: Instant? = null,
+
+    @Column
+    @Version
+    var version: Int? = null
+) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as OneTimeCodeEntity
+
+        return id != null && id == other.id
+    }
+
+    override fun hashCode(): Int = javaClass.hashCode()
+
+    override fun toString(): String {
+        return this::class.simpleName + "(id = $id, oneTimeCodeId = $oneTimeCodeId, value = $value, expires = $expires, attempts = $attempts, status = $status)"
+    }
 }
 
 enum class Status {

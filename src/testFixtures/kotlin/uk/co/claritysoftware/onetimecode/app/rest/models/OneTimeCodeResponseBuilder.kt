@@ -1,6 +1,5 @@
-package uk.co.claritysoftware.onetimecode.app
+package uk.co.claritysoftware.onetimecode.app.rest.models
 
-import uk.co.claritysoftware.onetimecode.app.rest.models.OneTimeCodeResponse
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID

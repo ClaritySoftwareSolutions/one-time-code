@@ -1,9 +1,9 @@
-package uk.co.claritysoftware.onetimecode.domain.repository
+package uk.co.claritysoftware.onetimecode.domain.service
 
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCode
 import java.util.UUID
 
-interface OneTimeCodeRepository {
+interface OneTimeCodePersistenceService {
 
     fun findByDomainId(domainId: UUID): OneTimeCode?
 
