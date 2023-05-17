@@ -9,7 +9,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
-import uk.co.claritysoftware.onetimecode.app.aOneTimeCodeResponse
+import uk.co.claritysoftware.onetimecode.app.rest.models.aOneTimeCodeResponse
 import uk.co.claritysoftware.onetimecode.domain.aOneTimeCode
 import java.time.Clock
 import java.time.Instant

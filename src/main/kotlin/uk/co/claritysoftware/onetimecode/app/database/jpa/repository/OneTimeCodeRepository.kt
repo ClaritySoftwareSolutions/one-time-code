@@ -6,4 +6,6 @@ import uk.co.claritysoftware.onetimecode.app.database.jpa.entity.OneTimeCodeEnti
 import java.util.UUID
 
 @Repository
-interface OneTimeCodeRepository : JpaRepository<OneTimeCodeEntity, UUID>
+interface OneTimeCodeRepository : JpaRepository<OneTimeCodeEntity, UUID> {
+    fun findByOneTimeCodeId(oneTimeCodeId: UUID): OneTimeCodeEntity?
+}

@@ -13,7 +13,6 @@ import org.mockito.kotlin.verify
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeValidationNotMatchedException
 import uk.co.claritysoftware.onetimecode.domain.aOneTimeCode
-import uk.co.claritysoftware.onetimecode.domain.repository.OneTimeCodeRepository
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
@@ -29,7 +28,7 @@ class OneTimeCodeServiceImplTest {
 
     private val configuration = mock<OneTimeCodeServiceConfiguration>()
 
-    private val repository = mock<OneTimeCodeRepository>()
+    private val persistenceService = mock<OneTimeCodePersistenceService>()
 
     private val fixedClock = Clock.fixed(Instant.now(), ZoneOffset.UTC)
 
@@ -38,7 +37,7 @@ class OneTimeCodeServiceImplTest {
         service = OneTimeCodeServiceImpl(
             factory,
             configuration,
-            repository,
+            persistenceService,
             fixedClock
         )
     }
@@ -69,7 +68,7 @@ class OneTimeCodeServiceImplTest {
 
         // Then
         assertThat(actual).isEqualTo(expectedOneTimeCode)
-        verify(repository).save(expectedOneTimeCode)
+        verify(persistenceService).save(expectedOneTimeCode)
         verify(factory).createOneTimeCode(characterSet, codeLength, codeTtlSeconds)
     }
 
@@ -82,7 +81,7 @@ class OneTimeCodeServiceImplTest {
             val code = "ABCD"
             val oneTimeCodeId = UUID.randomUUID()
 
-            given(repository.findByDomainId(any())).willReturn(null)
+            given(persistenceService.findByDomainId(any())).willReturn(null)
 
             // When
             val exception = catchThrowableOfType(
@@ -92,7 +91,7 @@ class OneTimeCodeServiceImplTest {
 
             // Then
             assertThat(exception.domainId).isEqualTo(oneTimeCodeId)
-            verify(repository).findByDomainId(oneTimeCodeId)
+            verify(persistenceService).findByDomainId(oneTimeCodeId)
         }
 
         @Test
@@ -106,14 +105,14 @@ class OneTimeCodeServiceImplTest {
 
             given(configuration.maximumValidationAttempts).willReturn(3)
 
-            given(repository.findByDomainId(any())).willReturn(oneTimeCode)
+            given(persistenceService.findByDomainId(any())).willReturn(oneTimeCode)
 
             // When
             service.validateOneTimeCode(oneTimeCodeId, code)
 
             // Then
-            verify(repository).findByDomainId(oneTimeCodeId)
-            verify(repository).save(oneTimeCode)
+            verify(persistenceService).findByDomainId(oneTimeCodeId)
+            verify(persistenceService).save(oneTimeCode)
         }
 
         @Test
@@ -127,7 +126,7 @@ class OneTimeCodeServiceImplTest {
 
             given(configuration.maximumValidationAttempts).willReturn(3)
 
-            given(repository.findByDomainId(any())).willReturn(oneTimeCode)
+            given(persistenceService.findByDomainId(any())).willReturn(oneTimeCode)
 
             // When
             val exception = catchThrowableOfType(
@@ -137,8 +136,8 @@ class OneTimeCodeServiceImplTest {
 
             // Then
             assertThat(exception.oneTimeCode).isEqualTo(oneTimeCode)
-            verify(repository).findByDomainId(oneTimeCodeId)
-            verify(repository).save(oneTimeCode)
+            verify(persistenceService).findByDomainId(oneTimeCodeId)
+            verify(persistenceService).save(oneTimeCode)
         }
     }
 }

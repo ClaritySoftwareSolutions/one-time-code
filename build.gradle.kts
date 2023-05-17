@@ -87,6 +87,7 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     dependsOn(tasks.withType<GenerateTask>())
     jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
+    useJUnitPlatform()
 }
 
 tasks.withType<GenerateTask> {
