@@ -58,6 +58,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.flywaydb:flyway-core")
 
     implementation("io.github.microutils:kotlin-logging-jvm:${property("kotlin.logging.version")}")
     implementation("org.springdoc:springdoc-openapi-ui:${property("springdoc.version")}")
