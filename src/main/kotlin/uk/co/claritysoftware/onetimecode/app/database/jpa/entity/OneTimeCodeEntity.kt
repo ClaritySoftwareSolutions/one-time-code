@@ -15,7 +15,7 @@ import org.hibernate.annotations.UuidGenerator
 import java.time.Instant
 import java.util.UUID
 
-@Table
+@Table(name = "one_time_code")
 @Entity
 class OneTimeCodeEntity(
 
@@ -27,7 +27,7 @@ class OneTimeCodeEntity(
     @Column
     var oneTimeCodeId: UUID? = null,
 
-    @Column
+    @Column(name = "\"value\"")
     var value: String? = null,
 
     @Column
