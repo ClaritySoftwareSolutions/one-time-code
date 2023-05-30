@@ -1,4 +1,4 @@
-package uk.co.claritysoftware.onetimecode.app.mapper
+package uk.co.claritysoftware.onetimecode.app.rest.mapper
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested

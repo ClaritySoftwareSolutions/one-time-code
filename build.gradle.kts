@@ -53,7 +53,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
@@ -68,11 +68,15 @@ dependencies {
 
     // Test dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework:spring-webflux")
+    testImplementation("io.projectreactor.netty:reactor-netty-http")
     testImplementation("org.mockito.kotlin:mockito-kotlin:${property("mockito.kotlin.version")}")
     testImplementation("com.h2database:h2:${property("h2.version")}")
 
     // Test fixtures dependencies
     testFixturesImplementation("org.assertj:assertj-core")
+    testFixturesImplementation("org.springframework:spring-test")
+    testFixturesImplementation("io.projectreactor:reactor-core")
 }
 
 tasks.withType<KotlinCompile> {
