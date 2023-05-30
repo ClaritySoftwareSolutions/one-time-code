@@ -8,6 +8,9 @@ import uk.co.claritysoftware.onetimecode.app.database.jpa.entity.OneTimeCodeEnti
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCode
 import java.util.UUID
 
+/**
+ * Mapper class to map to and from JPA and Domain implementations/representations of a One Time Code
+ */
 @Mapper(
     uses = [
         StatusEntityMapper::class

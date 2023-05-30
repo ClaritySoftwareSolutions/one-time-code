@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: One Time Code APIs
-  version: '0.0.1'
+  version: '0.0.2'
   description: OpenAPI Spec document describing the REST APIs for the One Time Code application
   contact:
     name: Clarity Software Solutions Ltd
@@ -43,6 +43,52 @@ paths:
       responses:
         201:
           $ref: '#/components/responses/OneTimeCode'
+
+  '/one-time-code/{id}':
+    parameters:
+      - name: id
+        description: The identifier of the One Time Code to validate.
+        schema:
+          type: string
+        in: path
+        required: true
+    options:
+      summary: CORS support
+      description: |
+        Enable CORS by returning correct headers
+      tags:
+        - One Time Code
+      responses:
+        200:
+          description: Default response for CORS method
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content: { }
+    post:
+      summary: Validates a One Time Code
+      description: Validates a One Time Code
+      operationId: validate-one-time-code
+      tags:
+        - One Time Code
+      requestBody:
+        $ref: '#/components/requestBodies/ValidateOneTimeCode'
+      responses:
+        204:
+          description: One Time Code validated successfully
+        400:
+          $ref: '#/components/responses/400ErrorResponse'
+        404:
+          $ref: '#/components/responses/404ErrorResponse'
+        409:
+          $ref: '#/components/responses/409ErrorResponse'
 
 # --------------------------------------------------------------------------------
 #
@@ -104,6 +150,16 @@ components:
         - code
         - expiry
 
+    ValidateOneTimeCodeRequest:
+      title: ValidateOneTimeCodeRequest
+      description: Request body object containing the data to validate a One Time Code
+      properties:
+        code:
+          type: string
+          description: The value to validate the One Time Code with
+          example: 'ABCDEF'
+      required:
+        - code
 
   #
   # Response Body Definitions
@@ -134,7 +190,7 @@ components:
     404ErrorResponse:
       description: |
         Error response for a HTTP 404 describing the problem with the request.
-        Typical examples are resources such as the application not found.
+        Typical examples are resources such as the One Time Code not found.
       headers:
         Access-Control-Allow-Origin:
           schema:
@@ -153,11 +209,11 @@ components:
             timestamp: '2022-09-28T18:01:42.105Z'
             status: 404
             error: 'Not Found'
-            message: 'Certificate photo for voter card application with eroId=[some-ero] and applicationType=[VOTER_CARD] and applicationId=[507f1f77bcf86cd799439011] not found'
+            message: 'One Time Code with id ea17ded9-6333-4492-9f34-fe4b7d4d6123 not found'
     409ErrorResponse:
       description: |
         Error response for a HTTP 409 describing the problem with the request.
-        Typical examples are that an application's status(es) are not in the required state to perform the requested operation.
+        Typical examples are that a One Time Code's status is not in the required state to perform the requested operation.
       headers:
         Access-Control-Allow-Origin:
           schema:
@@ -176,7 +232,7 @@ components:
             timestamp: '2022-09-28T18:01:42.105Z'
             status: 409
             error: 'Conflict'
-            message: 'An application with eroId = some-ero and applicationType = VOTER_CARD and applicationId = 507f1f77bcf86cd799439011 has an unexpected photoCheckStatus = ACCEPTED'
+            message: 'One Time Code with id ea17ded9-6333-4492-9f34-fe4b7d4d6123 has an unexpected status = TOO_MANY_VALIDATION_ATTEMPTS'
 
     OneTimeCode:
       description: Response object containing a One Time Code
@@ -194,3 +250,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/OneTimeCodeResponse'
+
+  #
+  # Request Body Definitions
+  # --------------------------------------------------------------------------------
+  requestBodies:
+    ValidateOneTimeCode:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidateOneTimeCodeRequest'

@@ -1,4 +1,4 @@
-package uk.co.claritysoftware.onetimecode.app.mapper
+package uk.co.claritysoftware.onetimecode.app.rest.mapper
 
 import org.springframework.stereotype.Component
 import java.time.Clock
