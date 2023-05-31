@@ -8,4 +8,6 @@ interface OneTimeCodePersistenceService {
     fun findByDomainId(domainId: UUID): OneTimeCode?
 
     fun save(oneTimeCode: OneTimeCode): OneTimeCode
+
+    fun remove(oneTimeCode: OneTimeCode)
 }
