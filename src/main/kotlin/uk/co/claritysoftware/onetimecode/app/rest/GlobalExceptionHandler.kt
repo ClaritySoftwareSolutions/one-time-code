@@ -18,6 +18,7 @@ import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import uk.co.claritysoftware.onetimecode.app.rest.exception.OneTimeCodeNotFoundException
 import uk.co.claritysoftware.onetimecode.app.rest.exception.OneTimeCodeTooManyAttemptsException
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeValidationNotMatchedException
 
 /**
  * Global Exception Handler. Handles specific exceptions thrown by the application by returning a suitable [ErrorResponse]
@@ -58,15 +59,31 @@ class GlobalExceptionHandler(
     }
 
     /**
-     * Exception handler to return a 410 Gone ErrorResponse
+     * Exception handler to return a 400 Bad Request ErrorResponse in response to a OneTimeCodeValidationNotMatchedException
+     */
+    @ExceptionHandler(
+        value = [
+            OneTimeCodeValidationNotMatchedException::class,
+        ]
+    )
+    fun handleOneTimeCodeValidationNotMatchedException(
+        e: OneTimeCodeValidationNotMatchedException,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        request.setAttribute(ERROR_MESSAGE, "One Time Code validation failed", SCOPE_REQUEST)
+        return populateErrorResponseAndHandleExceptionInternal(e, BAD_REQUEST, request)
+    }
+
+    /**
+     * Exception handler to return a 410 Gone ErrorResponse in response to a OneTimeCodeTooManyAttemptsException
      */
     @ExceptionHandler(
         value = [
             OneTimeCodeTooManyAttemptsException::class,
         ]
     )
-    fun handleExceptionReturnConflictErrorResponse(
-        e: RuntimeException,
+    fun handleOneTimeCodeTooManyAttemptsException(
+        e: OneTimeCodeTooManyAttemptsException,
         request: WebRequest
     ): ResponseEntity<Any> {
         request.setAttribute(ERROR_MESSAGE, "One Time Code has failed validation and has been removed", SCOPE_REQUEST)

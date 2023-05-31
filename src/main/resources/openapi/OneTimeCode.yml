@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: One Time Code APIs
-  version: '0.0.3'
+  version: '0.0.4'
   description: OpenAPI Spec document describing the REST APIs for the One Time Code application
   contact:
     name: Clarity Software Solutions Ltd
@@ -168,7 +168,10 @@ components:
   # --------------------------------------------------------------------------------
   responses:
     400ErrorResponse:
-      description: Error response for a HTTP 400 describing fields in the request payload that are in error
+      description: |
+        Error response for a HTTP 400 describing a problem with the client request.
+        Typical examples are are the request to validate a One Time Code failed, but can also be used in cases
+        such as an invalid request body.
       headers:
         Access-Control-Allow-Origin:
           schema:
@@ -183,12 +186,22 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-          example:
-            timestamp: '2022-09-28T18:01:42.105Z'
-            status: 400
-            error: 'Bad Request'
-            message: 'Validation failed for object=applicationRequest. Error count: 14'
-            validationErrors: 'Error on field applicant.nino: rejected value [aaaaaaaaaaa], must match ^.{1,10}$'
+          examples:
+            failed-to-validate-one-time-code:
+              summary: Example response body for when validation of a One Time Code has failed
+              value:
+                timestamp: '2022-09-28T18:01:42.105Z'
+                status: 400
+                error: 'Bad Request'
+                message: 'One Time Code validation failed'
+            request-body-validation-error:
+              summary: Example response body for when the client supplied request body is not valid in some way
+              value:
+                timestamp: '2022-09-28T18:01:42.105Z'
+                status: 400
+                error: 'Bad Request'
+                message: 'Validation failed for object=validateOneTimeCodeRequest. Error count: 1'
+                validationErrors: 'Error on field code: rejected value [aaaaaaaaaaa], must match ^.{1,10}$'
     404ErrorResponse:
       description: |
         Error response for a HTTP 404 describing the problem with the request.
