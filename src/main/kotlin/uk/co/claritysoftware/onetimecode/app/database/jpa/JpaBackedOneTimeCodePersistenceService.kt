@@ -34,6 +34,13 @@ class JpaBackedOneTimeCodePersistenceService(
         return oneTimeCode
     }
 
+    @Transactional
+    override fun remove(oneTimeCode: OneTimeCode) {
+        oneTimeCodeRepository.findByOneTimeCodeId(oneTimeCode.id)?.run {
+            oneTimeCodeRepository.delete(this)
+        }
+    }
+
     private fun OneTimeCodeEntity.updateFromDomain(oneTimeCode: OneTimeCode) {
         status = statusEntityMapper.fromDomainToEntity(oneTimeCode.status)
         attempts = oneTimeCode.validationAttempts

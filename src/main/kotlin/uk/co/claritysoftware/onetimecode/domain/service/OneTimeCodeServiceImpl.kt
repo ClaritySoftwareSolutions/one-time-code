@@ -2,6 +2,7 @@ package uk.co.claritysoftware.onetimecode.domain.service
 
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCode
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeTooManyAttemptsException
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
@@ -26,8 +27,14 @@ class OneTimeCodeServiceImpl(
 
         try {
             oneTimeCode.validate(code, Instant.now(clock), configuration.maximumValidationAttempts)
-        } finally {
             persistenceService.save(oneTimeCode)
+        } catch (e: RuntimeException) {
+            if (e is OneTimeCodeTooManyAttemptsException) {
+                persistenceService.remove(oneTimeCode)
+            } else {
+                persistenceService.save(oneTimeCode)
+            }
+            throw e
         }
     }
 }

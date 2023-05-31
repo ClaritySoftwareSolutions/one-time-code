@@ -1,8 +1,10 @@
 package uk.co.claritysoftware.onetimecode.app.rest
 
+import jakarta.servlet.RequestDispatcher.ERROR_MESSAGE
 import jakarta.servlet.RequestDispatcher.ERROR_STATUS_CODE
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.GONE
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
@@ -11,9 +13,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.RequestAttributes
+import org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import uk.co.claritysoftware.onetimecode.app.rest.exception.OneTimeCodeNotFoundException
+import uk.co.claritysoftware.onetimecode.app.rest.exception.OneTimeCodeTooManyAttemptsException
 
 /**
  * Global Exception Handler. Handles specific exceptions thrown by the application by returning a suitable [ErrorResponse]
@@ -51,6 +55,22 @@ class GlobalExceptionHandler(
         request: WebRequest
     ): ResponseEntity<Any> {
         return populateErrorResponseAndHandleExceptionInternal(e, NOT_FOUND, request)
+    }
+
+    /**
+     * Exception handler to return a 410 Gone ErrorResponse
+     */
+    @ExceptionHandler(
+        value = [
+            OneTimeCodeTooManyAttemptsException::class,
+        ]
+    )
+    fun handleExceptionReturnConflictErrorResponse(
+        e: RuntimeException,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        request.setAttribute(ERROR_MESSAGE, "One Time Code has failed validation and has been removed", SCOPE_REQUEST)
+        return populateErrorResponseAndHandleExceptionInternal(e, GONE, request)
     }
 
     /**

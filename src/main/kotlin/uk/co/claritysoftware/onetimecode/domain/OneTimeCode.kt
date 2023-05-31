@@ -6,7 +6,6 @@ import uk.co.claritysoftware.onetimecode.domain.Status.TOO_MANY_VALIDATION_ATTEM
 import uk.co.claritysoftware.onetimecode.domain.Status.VALIDATED
 import java.time.Instant
 import java.util.UUID
-import kotlin.jvm.Throws
 
 class OneTimeCode private constructor(
     val id: UUID,
@@ -27,12 +26,11 @@ class OneTimeCode private constructor(
         OneTimeCodeValidationNotMatchedException::class
     )
     fun validate(code: String, now: Instant, maximumValidationAttempts: Int) {
+        incrementValidationAttempts()
         checkCurrentStatus()
 
-        incrementValidationAttempts()
-        checkValidationAttempts(maximumValidationAttempts)
         checkExpiry(now)
-        validateCode(code)
+        validateCode(code, maximumValidationAttempts)
     }
 
     @Throws(
@@ -55,11 +53,16 @@ class OneTimeCode private constructor(
         }
     }
 
-    @Throws(OneTimeCodeValidationNotMatchedException::class)
-    private fun validateCode(code: String) {
+    @Throws(
+        OneTimeCodeValidationNotMatchedException::class,
+        OneTimeCodeTooManyAttemptsException::class
+    )
+    private fun validateCode(code: String, maximumValidationAttempts: Int) {
         if (this.code == code) {
             status = VALIDATED
         } else {
+            checkValidationAttempts(maximumValidationAttempts)
+
             status = NOT_VALIDATED
             throw OneTimeCodeValidationNotMatchedException(this)
         }
@@ -67,7 +70,7 @@ class OneTimeCode private constructor(
 
     @Throws(OneTimeCodeTooManyAttemptsException::class)
     private fun checkValidationAttempts(maximumValidationAttempts: Int) {
-        if (validationAttempts > maximumValidationAttempts) {
+        if (validationAttempts == maximumValidationAttempts) {
             status = TOO_MANY_VALIDATION_ATTEMPTS
             throw OneTimeCodeTooManyAttemptsException(this)
         }

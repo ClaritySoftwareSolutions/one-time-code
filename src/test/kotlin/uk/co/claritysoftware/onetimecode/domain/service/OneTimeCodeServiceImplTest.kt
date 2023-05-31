@@ -11,6 +11,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeTooManyAttemptsException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeValidationNotMatchedException
 import uk.co.claritysoftware.onetimecode.domain.aOneTimeCode
 import java.time.Clock
@@ -138,6 +139,32 @@ class OneTimeCodeServiceImplTest {
             assertThat(exception.oneTimeCode).isEqualTo(oneTimeCode)
             verify(persistenceService).findByDomainId(oneTimeCodeId)
             verify(persistenceService).save(oneTimeCode)
+        }
+
+        @Test
+        fun `should validate and delete one time code given unsuccessful validation exceeds number of attempts`() {
+            // Given
+            val oneTimeCode = aOneTimeCode(
+                code = "ABCD",
+                expiry = Instant.now(fixedClock).plus(1, ChronoUnit.SECONDS),
+                validationAttempts = 2
+            )
+            val oneTimeCodeId = oneTimeCode.id
+
+            given(configuration.maximumValidationAttempts).willReturn(3)
+
+            given(persistenceService.findByDomainId(any())).willReturn(oneTimeCode)
+
+            // When
+            val exception = catchThrowableOfType(
+                { service.validateOneTimeCode(oneTimeCodeId, "WXYZ") },
+                OneTimeCodeTooManyAttemptsException::class.java
+            )
+
+            // Then
+            assertThat(exception.oneTimeCode).isEqualTo(oneTimeCode)
+            verify(persistenceService).findByDomainId(oneTimeCodeId)
+            verify(persistenceService).remove(oneTimeCode)
         }
     }
 }
