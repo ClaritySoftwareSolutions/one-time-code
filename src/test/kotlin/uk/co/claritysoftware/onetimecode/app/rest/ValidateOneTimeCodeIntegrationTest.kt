@@ -48,6 +48,41 @@ class ValidateOneTimeCodeIntegrationTest {
     }
 
     @Test
+    fun `should not validate one time code given incorrect code`() {
+        // Given
+        val oneTimeCodeId = UUID.randomUUID()
+        val oneTimeCodeEntity = aOneTimeCodeEntity(
+            oneTimeCodeId = oneTimeCodeId,
+            attempts = 0,
+            value = "ABCD"
+        )
+        repository.save(oneTimeCodeEntity)
+
+        val validationRequest = adValidateOneTimeCodeRequest(
+            code = "XYZ"
+        )
+
+        // When
+        val response = webTestClient
+            .post()
+            .uri("/one-time-code/{id}", oneTimeCodeId)
+            .withBody(validationRequest)
+            .exchange()
+            .expectStatus().isBadRequest
+            .returnResult(ErrorResponse::class.java)
+
+        // Then
+        val actual = response.responseBody.blockFirst()
+        assertThat(actual)
+            .hasStatus(400)
+            .hasError("Bad Request")
+            .hasMessage("One Time Code validation failed")
+
+        // assert that the One Time Code has not been deleted
+        assertThat(repository.findByOneTimeCodeId(oneTimeCodeId)).isNotNull()
+    }
+
+    @Test
     fun `should not validate one time code given last attempt at validation with incorrect code`() {
         // Given
         val oneTimeCodeId = UUID.randomUUID()
