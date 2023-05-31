@@ -1,4 +1,4 @@
-package uk.co.claritysoftware.onetimecode.app.rest.service
+package uk.co.claritysoftware.onetimecode.app.rest
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowableOfType
@@ -13,21 +13,24 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.co.claritysoftware.onetimecode.app.assertj.assertions.assertThat
 import uk.co.claritysoftware.onetimecode.app.rest.exception.OneTimeCodeNotFoundException
+import uk.co.claritysoftware.onetimecode.app.rest.exception.OneTimeCodeTooManyAttemptsException
 import uk.co.claritysoftware.onetimecode.app.rest.mapper.OneTimeCodeMapper
 import uk.co.claritysoftware.onetimecode.app.rest.models.aOneTimeCodeResponse
+import uk.co.claritysoftware.onetimecode.app.rest.models.adValidateOneTimeCodeRequest
 import uk.co.claritysoftware.onetimecode.domain.aOneTimeCode
+import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeService
 import java.util.UUID
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException as DomainOneTimeCodeNotFoundException
-import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeService as DomainService
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeTooManyAttemptsException as DomainOneTimeCodeTooManyAttemptsException
 
 @ExtendWith(MockitoExtension::class)
-class OneTimeCodeServiceTest {
+class OneTimeCodeControllerTest {
 
     @InjectMocks
-    private lateinit var service: OneTimeCodeService
+    private lateinit var controller: OneTimeCodeController
 
     @Mock
-    private lateinit var domainService: DomainService
+    private lateinit var domainService: OneTimeCodeService
 
     @Mock
     private lateinit var oneTimeCodeMapper: OneTimeCodeMapper
@@ -44,7 +47,7 @@ class OneTimeCodeServiceTest {
             given(oneTimeCodeMapper.fromDomainToApi(any())).willReturn(restApiOneTimeCode)
 
             // When
-            val actual = service.generateOneTimeCode()
+            val actual = controller.generateOneTimeCode()
 
             // Then
             assertThat(actual).isEqualTo(restApiOneTimeCode)
@@ -60,9 +63,12 @@ class OneTimeCodeServiceTest {
             // Given
             val id = UUID.randomUUID()
             val code = "ABCD"
+            val request = adValidateOneTimeCodeRequest(
+                code = code
+            )
 
             // When
-            service.validateOneTimeCode(id, code)
+            controller.validateOneTimeCode(id, request)
 
             // Then
             verify(domainService).validateOneTimeCode(id, code)
@@ -79,14 +85,45 @@ class OneTimeCodeServiceTest {
                 domainException
             )
 
+            val request = adValidateOneTimeCodeRequest(
+                code = code
+            )
+
             // When
             val exception = catchThrowableOfType(
-                { service.validateOneTimeCode(id, code) },
+                { controller.validateOneTimeCode(id, request) },
                 OneTimeCodeNotFoundException::class.java
             )
 
             // Then
             assertThat(exception).hasMessage("One Time Code not found")
+            verify(domainService).validateOneTimeCode(id, code)
+        }
+
+        @Test
+        fun `should not validate one time code given domain throws too many attempts exception`() {
+            // Given
+            val id = UUID.randomUUID()
+            val code = "ABCD"
+
+            val oneTimeCode = aOneTimeCode(id = id)
+            val domainException = DomainOneTimeCodeTooManyAttemptsException(oneTimeCode)
+            given(domainService.validateOneTimeCode(any(), any())).willThrow(
+                domainException
+            )
+
+            val request = adValidateOneTimeCodeRequest(
+                code = code
+            )
+
+            // When
+            val exception = catchThrowableOfType(
+                { controller.validateOneTimeCode(id, request) },
+                OneTimeCodeTooManyAttemptsException::class.java
+            )
+
+            // Then
+            assertThat(exception).hasMessage("One Time Code has had too many validation attempts")
             verify(domainService).validateOneTimeCode(id, code)
         }
     }
