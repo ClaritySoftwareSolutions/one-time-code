@@ -14,6 +14,7 @@ import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeTooManyAttemptsException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeValidationNotMatchedException
 import uk.co.claritysoftware.onetimecode.domain.aOneTimeCode
+import uk.co.claritysoftware.onetimecode.domain.assertj.assertions.assertThat
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
@@ -21,11 +22,9 @@ import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OneTimeCodeServiceImplTest {
+class OneTimeCodeServiceTest {
 
-    private lateinit var service: OneTimeCodeServiceImpl
-
-    private val factory = mock<OneTimeCodeFactory>()
+    private lateinit var service: OneTimeCodeService
 
     private val configuration = mock<OneTimeCodeServiceConfiguration>()
 
@@ -35,8 +34,7 @@ class OneTimeCodeServiceImplTest {
 
     @BeforeAll
     fun setup() {
-        service = OneTimeCodeServiceImpl(
-            factory,
+        service = OneTimeCodeService(
             configuration,
             persistenceService,
             fixedClock
@@ -46,7 +44,7 @@ class OneTimeCodeServiceImplTest {
     @Test
     fun `should create one time code`() {
         // Given
-        val characterSet = setOf('A', 'B', 'C')
+        val characterSet = setOf('A')
         val codeLength = 4
         val codeTtlSeconds = 120L
 
@@ -54,23 +52,19 @@ class OneTimeCodeServiceImplTest {
         given(configuration.codeLength).willReturn(codeLength)
         given(configuration.codeTtlSeconds).willReturn(codeTtlSeconds)
 
-        val expectedCode = "ABCA"
-        val expectedExpiry = Instant.now().plusSeconds(codeTtlSeconds)
+        val expectedCode = "AAAA"
+        val expectedExpiry = Instant.now(fixedClock).plusSeconds(codeTtlSeconds)
         val expectedValidationAttempts = 0
-        val expectedOneTimeCode = aOneTimeCode(
-            code = expectedCode,
-            expiry = expectedExpiry,
-            validationAttempts = expectedValidationAttempts
-        )
-        given(factory.createOneTimeCode(any(), any(), any())).willReturn(expectedOneTimeCode)
 
         // When
         val actual = service.createOneTimeCode()
 
         // Then
-        assertThat(actual).isEqualTo(expectedOneTimeCode)
-        verify(persistenceService).save(expectedOneTimeCode)
-        verify(factory).createOneTimeCode(characterSet, codeLength, codeTtlSeconds)
+        assertThat(actual)
+            .hasCode(expectedCode)
+            .hasValidationAttempts(expectedValidationAttempts)
+            .hasExpiry(expectedExpiry)
+        verify(persistenceService).save(actual)
     }
 
     @Nested

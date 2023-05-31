@@ -10,15 +10,13 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import uk.co.claritysoftware.onetimecode.app.rest.exception.OneTimeCodeNotFoundException
-import uk.co.claritysoftware.onetimecode.app.rest.exception.OneTimeCodeTooManyAttemptsException
 import uk.co.claritysoftware.onetimecode.app.rest.mapper.OneTimeCodeMapper
 import uk.co.claritysoftware.onetimecode.app.rest.models.OneTimeCodeResponse
 import uk.co.claritysoftware.onetimecode.app.rest.models.ValidateOneTimeCodeRequest
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeTooManyAttemptsException
 import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeService
 import java.util.UUID
-import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException as DomainOneTimeCodeNotFoundException
-import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeTooManyAttemptsException as DomainOneTimeCodeTooManyAttemptsException
 
 private val logger = KotlinLogging.logger {}
 
@@ -42,12 +40,12 @@ class OneTimeCodeController(
     fun validateOneTimeCode(@PathVariable id: UUID, @RequestBody @Valid request: ValidateOneTimeCodeRequest) {
         try {
             domainService.validateOneTimeCode(id, request.code)
-        } catch (e: DomainOneTimeCodeTooManyAttemptsException) {
+        } catch (e: OneTimeCodeTooManyAttemptsException) {
             logger.debug { "One Time Code $id has had too many validation attempts" }
-            throw OneTimeCodeTooManyAttemptsException(id)
-        } catch (e: DomainOneTimeCodeNotFoundException) {
+            throw e
+        } catch (e: OneTimeCodeNotFoundException) {
             logger.debug { "One Time Code $id was not found" }
-            throw OneTimeCodeNotFoundException(id)
+            throw e
         }
     }
 }

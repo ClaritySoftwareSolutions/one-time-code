@@ -12,16 +12,14 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import uk.co.claritysoftware.onetimecode.app.assertj.assertions.assertThat
-import uk.co.claritysoftware.onetimecode.app.rest.exception.OneTimeCodeNotFoundException
-import uk.co.claritysoftware.onetimecode.app.rest.exception.OneTimeCodeTooManyAttemptsException
 import uk.co.claritysoftware.onetimecode.app.rest.mapper.OneTimeCodeMapper
 import uk.co.claritysoftware.onetimecode.app.rest.models.aOneTimeCodeResponse
 import uk.co.claritysoftware.onetimecode.app.rest.models.adValidateOneTimeCodeRequest
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeTooManyAttemptsException
 import uk.co.claritysoftware.onetimecode.domain.aOneTimeCode
 import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeService
 import java.util.UUID
-import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException as DomainOneTimeCodeNotFoundException
-import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeTooManyAttemptsException as DomainOneTimeCodeTooManyAttemptsException
 
 @ExtendWith(MockitoExtension::class)
 class OneTimeCodeControllerTest {
@@ -80,7 +78,7 @@ class OneTimeCodeControllerTest {
             val id = UUID.randomUUID()
             val code = "ABCD"
 
-            val domainException = DomainOneTimeCodeNotFoundException(id)
+            val domainException = OneTimeCodeNotFoundException(id)
             given(domainService.validateOneTimeCode(any(), any())).willThrow(
                 domainException
             )
@@ -96,7 +94,7 @@ class OneTimeCodeControllerTest {
             )
 
             // Then
-            assertThat(exception).hasMessage("One Time Code not found")
+            assertThat(exception).isEqualTo(domainException)
             verify(domainService).validateOneTimeCode(id, code)
         }
 
@@ -107,7 +105,7 @@ class OneTimeCodeControllerTest {
             val code = "ABCD"
 
             val oneTimeCode = aOneTimeCode(id = id)
-            val domainException = DomainOneTimeCodeTooManyAttemptsException(oneTimeCode)
+            val domainException = OneTimeCodeTooManyAttemptsException(oneTimeCode)
             given(domainService.validateOneTimeCode(any(), any())).willThrow(
                 domainException
             )
@@ -123,7 +121,7 @@ class OneTimeCodeControllerTest {
             )
 
             // Then
-            assertThat(exception).hasMessage("One Time Code has had too many validation attempts")
+            assertThat(exception).isEqualTo(domainException)
             verify(domainService).validateOneTimeCode(id, code)
         }
     }
