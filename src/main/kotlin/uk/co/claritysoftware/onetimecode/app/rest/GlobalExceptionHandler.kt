@@ -16,8 +16,8 @@ import org.springframework.web.context.request.RequestAttributes
 import org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-import uk.co.claritysoftware.onetimecode.app.rest.exception.OneTimeCodeNotFoundException
-import uk.co.claritysoftware.onetimecode.app.rest.exception.OneTimeCodeTooManyAttemptsException
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeTooManyAttemptsException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeValidationNotMatchedException
 
 /**
