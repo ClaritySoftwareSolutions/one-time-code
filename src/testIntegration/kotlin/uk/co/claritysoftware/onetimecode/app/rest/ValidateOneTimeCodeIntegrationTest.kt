@@ -3,9 +3,9 @@ package uk.co.claritysoftware.onetimecode.app.rest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus.GONE
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.co.claritysoftware.onetimecode.app.IntegrationTest
 import uk.co.claritysoftware.onetimecode.app.assertj.assertions.assertThat
 import uk.co.claritysoftware.onetimecode.app.database.jpa.entity.aOneTimeCodeEntity
 import uk.co.claritysoftware.onetimecode.app.database.jpa.repository.OneTimeCodeRepository
@@ -14,10 +14,7 @@ import uk.co.claritysoftware.onetimecode.app.rest.models.adValidateOneTimeCodeRe
 import uk.co.claritysoftware.onetimecode.common.withBody
 import java.util.UUID
 
-@SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
-class ValidateOneTimeCodeIntegrationTest {
+class ValidateOneTimeCodeIntegrationTest : IntegrationTest() {
 
     @Autowired
     private lateinit var webTestClient: WebTestClient
