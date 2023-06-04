@@ -16,8 +16,10 @@ jobs:
           java-version: 17
           cache: gradle
 
-      - name: Run gradle `check` to lint source code and run tests
-        run: ./gradlew clean check --no-daemon
+      - name: Run gradle `check` to lint source code and run unit tests
+        run: ./gradlew --daemon check
+      - name: Run gradle `testIntegration` to run integration tests
+        run: ./gradlew --daemon testIntegration
 
       - name: Save logs on test failure
         uses: actions/upload-artifact@v3

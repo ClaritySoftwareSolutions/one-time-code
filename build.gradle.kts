@@ -12,6 +12,9 @@ plugins {
     kotlin("kapt") version "1.8.20"
     id("org.openapi.generator") version "6.5.0"
 
+    id("com.adarshr.test-logger") version "3.2.0"
+    id("org.unbroken-dome.test-sets") version "4.0.0"
+
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
     id("org.jlleitschuh.gradle.ktlint-idea") version "10.3.0"
 
@@ -77,6 +80,14 @@ dependencies {
     testFixturesImplementation("org.assertj:assertj-core")
     testFixturesImplementation("org.springframework:spring-test")
     testFixturesImplementation("io.projectreactor:reactor-core")
+}
+
+testSets {
+    "testIntegration"()
+}
+
+tasks.register("testAll") {
+    dependsOn("check", "testIntegration")
 }
 
 tasks.withType<KotlinCompile> {

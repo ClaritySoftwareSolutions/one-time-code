@@ -2,15 +2,12 @@ package uk.co.claritysoftware.onetimecode.app.rest
 
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.co.claritysoftware.onetimecode.app.IntegrationTest
 import uk.co.claritysoftware.onetimecode.app.assertj.assertions.assertThat
 import uk.co.claritysoftware.onetimecode.app.rest.models.OneTimeCodeResponse
 
-@SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
-class GenerateOneTimeCodeIntegrationTest {
+class GenerateOneTimeCodeIntegrationTest : IntegrationTest() {
 
     @Autowired
     private lateinit var webTestClient: WebTestClient
