@@ -39,11 +39,13 @@ class OneTimeCodeService(
     /**
      * Validate a [OneTimeCode] given it's ID and a code to attempt validation with.
      *
-     * Validating a One Time Code, whether successful or not, increments the One Time Code's count of validation attempts
-     * and the One Time Code is updated in the persistence service.
+     * If the One Time Code is validated successfully it is removed from the persistence service.
      *
      * If the One Time Code has expired, validation is not checked, amd the One Time Code is removed from the
      * persistence service.
+     *
+     * If validating the One Time Code is unsuccessful the One Time Code's count of validation attempts is incremented
+     * and the One Time Code is updated in the persistence service.
      *
      * If the validation attempt fails, and this is the last validation attempt (based on the validation attempt count vs.
      * the configuration's maximum validation attempts), the One Time Code is removed from the persistence service.
@@ -65,7 +67,7 @@ class OneTimeCodeService(
 
         try {
             oneTimeCode.validate(code, Instant.now(clock), configuration.maximumValidationAttempts)
-            persistenceService.save(oneTimeCode)
+            persistenceService.remove(oneTimeCode)
         } catch (e: RuntimeException) {
             if (e is OneTimeCodeTooManyAttemptsException) {
                 persistenceService.remove(oneTimeCode)

@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.GONE
+import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.co.claritysoftware.onetimecode.app.IntegrationTest
 import uk.co.claritysoftware.onetimecode.app.assertj.assertions.assertThat
@@ -21,6 +22,37 @@ class ValidateOneTimeCodeIntegrationTest : IntegrationTest() {
 
     @Autowired
     private lateinit var repository: OneTimeCodeRepository
+
+    @Test
+    fun `should validate one time code given one time code exists`() {
+        // Given
+        val oneTimeCodeId = UUID.randomUUID()
+        val oneTimeCodeEntity = aOneTimeCodeEntity(
+            oneTimeCodeId = oneTimeCodeId,
+            attempts = 0,
+            value = "ABCD"
+        )
+        repository.save(oneTimeCodeEntity)
+
+        val validationRequest = adValidateOneTimeCodeRequest(
+            code = "ABCD"
+        )
+
+        // When
+        val response = webTestClient
+            .post()
+            .uri("/one-time-code/{id}", oneTimeCodeId)
+            .withBody(validationRequest)
+            .exchange()
+            .expectStatus().isNoContent
+            .returnResult(Void::class.java)
+
+        // Then
+        assertThat(response.status).isEqualTo(NO_CONTENT)
+
+        // assert that the One Time Code has been deleted as well
+        assertThat(repository.findByOneTimeCodeId(oneTimeCodeId)).isNull()
+    }
 
     @Test
     fun `should not validate one time code given one time code does not exist`() {

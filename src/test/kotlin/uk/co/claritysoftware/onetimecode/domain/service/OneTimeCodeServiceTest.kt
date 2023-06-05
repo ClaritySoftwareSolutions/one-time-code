@@ -107,7 +107,7 @@ class OneTimeCodeServiceTest {
 
             // Then
             verify(persistenceService).findByDomainId(oneTimeCodeId)
-            verify(persistenceService).save(oneTimeCode)
+            verify(persistenceService).remove(oneTimeCode)
         }
 
         @Test
