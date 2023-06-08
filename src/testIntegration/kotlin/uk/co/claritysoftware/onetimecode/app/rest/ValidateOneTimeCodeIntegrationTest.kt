@@ -13,6 +13,7 @@ import uk.co.claritysoftware.onetimecode.app.database.jpa.repository.OneTimeCode
 import uk.co.claritysoftware.onetimecode.app.rest.models.ErrorResponse
 import uk.co.claritysoftware.onetimecode.app.rest.models.adValidateOneTimeCodeRequest
 import uk.co.claritysoftware.onetimecode.common.withBody
+import java.time.Instant
 import java.util.UUID
 
 class ValidateOneTimeCodeIntegrationTest : IntegrationTest() {
@@ -141,6 +142,41 @@ class ValidateOneTimeCodeIntegrationTest : IntegrationTest() {
             .hasStatus(410)
             .hasError("Gone")
             .hasMessage("One Time Code has failed validation and has been removed")
+
+        // assert that the One Time Code has been deleted as well
+        assertThat(repository.findByOneTimeCodeId(oneTimeCodeId)).isNull()
+    }
+
+    @Test
+    fun `should not validate one time code given one time code has expired`() {
+        // Given
+        val oneTimeCodeId = UUID.randomUUID()
+        val oneTimeCodeEntity = aOneTimeCodeEntity(
+            oneTimeCodeId = oneTimeCodeId,
+            expires = Instant.now(fixedClock).minusSeconds(1),
+            value = "ABCD"
+        )
+        repository.save(oneTimeCodeEntity)
+
+        val validationRequest = adValidateOneTimeCodeRequest(
+            code = "ABCD"
+        )
+
+        // When
+        val response = webTestClient
+            .post()
+            .uri("/one-time-code/{id}", oneTimeCodeId)
+            .withBody(validationRequest)
+            .exchange()
+            .expectStatus().isEqualTo(GONE)
+            .returnResult(ErrorResponse::class.java)
+
+        // Then
+        val actual = response.responseBody.blockFirst()
+        assertThat(actual)
+            .hasStatus(410)
+            .hasError("Gone")
+            .hasMessage("One Time Code has expired and has been removed")
 
         // assert that the One Time Code has been deleted as well
         assertThat(repository.findByOneTimeCodeId(oneTimeCodeId)).isNull()

@@ -10,6 +10,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeExpiredException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeTooManyAttemptsException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeValidationNotMatchedException
@@ -153,6 +154,31 @@ class OneTimeCodeServiceTest {
             val exception = catchThrowableOfType(
                 { service.validateOneTimeCode(oneTimeCodeId, "WXYZ") },
                 OneTimeCodeTooManyAttemptsException::class.java
+            )
+
+            // Then
+            assertThat(exception.oneTimeCode).isEqualTo(oneTimeCode)
+            verify(persistenceService).findByDomainId(oneTimeCodeId)
+            verify(persistenceService).remove(oneTimeCode)
+        }
+
+        @Test
+        fun `should validate and delete one time code given one time code has expired`() {
+            // Given
+            val oneTimeCode = aOneTimeCode(
+                code = "ABCD",
+                expiry = Instant.now(fixedClock).minus(1, ChronoUnit.SECONDS)
+            )
+            val oneTimeCodeId = oneTimeCode.id
+
+            given(configuration.maximumValidationAttempts).willReturn(3)
+
+            given(persistenceService.findByDomainId(any())).willReturn(oneTimeCode)
+
+            // When
+            val exception = catchThrowableOfType(
+                { service.validateOneTimeCode(oneTimeCodeId, "ABCD") },
+                OneTimeCodeExpiredException::class.java
             )
 
             // Then

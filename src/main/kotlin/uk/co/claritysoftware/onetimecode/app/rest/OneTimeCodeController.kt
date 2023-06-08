@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 import uk.co.claritysoftware.onetimecode.app.rest.mapper.OneTimeCodeMapper
 import uk.co.claritysoftware.onetimecode.app.rest.models.OneTimeCodeResponse
 import uk.co.claritysoftware.onetimecode.app.rest.models.ValidateOneTimeCodeRequest
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeExpiredException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeTooManyAttemptsException
 import uk.co.claritysoftware.onetimecode.domain.service.OneTimeCodeService
@@ -45,6 +46,9 @@ class OneTimeCodeController(
             throw e
         } catch (e: OneTimeCodeNotFoundException) {
             logger.debug { "One Time Code $id was not found" }
+            throw e
+        } catch (e: OneTimeCodeExpiredException) {
+            logger.debug { "One Time Code $id expired at ${e.oneTimeCode.expiry}" }
             throw e
         }
     }

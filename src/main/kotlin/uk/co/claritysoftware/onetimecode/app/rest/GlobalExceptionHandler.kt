@@ -16,6 +16,7 @@ import org.springframework.web.context.request.RequestAttributes
 import org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeExpiredException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeNotFoundException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeTooManyAttemptsException
 import uk.co.claritysoftware.onetimecode.domain.OneTimeCodeValidationNotMatchedException
@@ -87,6 +88,22 @@ class GlobalExceptionHandler(
         request: WebRequest
     ): ResponseEntity<Any> {
         request.setAttribute(ERROR_MESSAGE, "One Time Code has failed validation and has been removed", SCOPE_REQUEST)
+        return populateErrorResponseAndHandleExceptionInternal(e, GONE, request)
+    }
+
+    /**
+     * Exception handler to return a 410 Gone ErrorResponse in response to a OneTimeCodeExpiredException
+     */
+    @ExceptionHandler(
+        value = [
+            OneTimeCodeExpiredException::class,
+        ]
+    )
+    fun handleOneTimeCodeExpiredException(
+        e: OneTimeCodeExpiredException,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        request.setAttribute(ERROR_MESSAGE, "One Time Code has expired and has been removed", SCOPE_REQUEST)
         return populateErrorResponseAndHandleExceptionInternal(e, GONE, request)
     }
 
