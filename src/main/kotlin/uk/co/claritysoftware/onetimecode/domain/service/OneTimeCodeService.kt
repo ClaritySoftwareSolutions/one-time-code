@@ -69,10 +69,10 @@ class OneTimeCodeService(
             oneTimeCode.validate(code, Instant.now(clock), configuration.maximumValidationAttempts)
             persistenceService.remove(oneTimeCode)
         } catch (e: RuntimeException) {
-            if (e is OneTimeCodeTooManyAttemptsException) {
-                persistenceService.remove(oneTimeCode)
-            } else {
-                persistenceService.save(oneTimeCode)
+            when (e) {
+                is OneTimeCodeTooManyAttemptsException -> persistenceService.remove(oneTimeCode)
+                is OneTimeCodeExpiredException -> persistenceService.remove(oneTimeCode)
+                else -> persistenceService.save(oneTimeCode)
             }
             throw e
         }
